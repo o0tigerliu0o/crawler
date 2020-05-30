@@ -26,7 +26,7 @@ var HouseRe = regexp.MustCompile(`data-v-3e01facc>([^>]*[^房])房`)
 var CarRe = regexp.MustCompile(`data-v-3e01facc>([^>]*[^车])车<`)
 var idUrlRe = regexp.MustCompile(`http://m.zhenai.com/u/([\d]+)`)
 
-func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
+func parseProfile(contents []byte, name string, url string) engine.ParseResult {
 	profile := model.Profile{}
 	profile.Name = name
 

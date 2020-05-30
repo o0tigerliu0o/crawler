@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"crawler/distributed/config"
 	"crawler/engine"
 	"regexp"
 	"strings"
@@ -11,7 +12,7 @@ var (
 	cityUrlRe = regexp.MustCompile(`href="(http://www.zhenai.com/zhenghun/[^"]+)"`)
 )
 
-func ParseCity(contents []byte,url string) engine.ParseResult {
+func ParseCity(contents []byte, url string) engine.ParseResult {
 
 	matches := profileRe.FindAllSubmatch(contents, -1)
 
@@ -22,7 +23,7 @@ func ParseCity(contents []byte,url string) engine.ParseResult {
 		result.Requests = append(result.Requests, engine.Request{
 			Url: url,
 			// 通过闭包传入账号名
-			ParserFunc: ProfileParser(string(m[2])),
+			Parser: NewProfileParser(string(m[2])),
 		})
 	}
 
@@ -31,14 +32,26 @@ func ParseCity(contents []byte,url string) engine.ParseResult {
 		result.Requests = append(result.Requests, engine.Request{
 			Url: string(m[1]),
 			// 通过闭包传入账号名
-			ParserFunc: ParseCity,
+			Parser: engine.NewFuncParser(ParseCity, config.ParseCity),
 		})
 	}
 	return result
 }
 
-func ProfileParser(name string) engine.ParserFunc{
-	return func(c []byte, url string) engine.ParseResult {
-		return ParseProfile(c,name,url)
+type ProfileParser struct {
+	userName string
+}
+
+func (p *ProfileParser) Parse(content []byte, url string) engine.ParseResult {
+	return parseProfile(content, url, p.userName)
+}
+
+func (p *ProfileParser) Serialize() (name string, args interface{}) {
+	return "ProfileParser", p.userName
+}
+
+func NewProfileParser(name string) *ProfileParser {
+	return &ProfileParser{
+		userName: name,
 	}
 }

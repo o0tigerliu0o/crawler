@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-func worker(r Request) (parseResult ParseResult, err error) {
+func Worker(r Request) (parseResult ParseResult, err error) {
 	log.Printf("Fetching: %s", r.Url)
 	var body []byte
 
@@ -35,5 +35,5 @@ func worker(r Request) (parseResult ParseResult, err error) {
 		}
 	}
 	// 解析转码后的内容获得自己需要的部分
-	return r.ParserFunc(body, r.Url), err
+	return r.Parser.Parse(body, r.Url), err
 }

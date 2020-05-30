@@ -74,7 +74,7 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifer) {
 			// 有任务到工作中
 			request := <-in
 			// 开始工作
-			result, err := worker(request)
+			result, err := Worker(request)
 			if nil != err {
 				continue
 			}

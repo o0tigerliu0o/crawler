@@ -1,13 +1,14 @@
 package engine
 
-
-// 公共解析函数
-type ParserFunc func(content []byte,url string) ParseResult
+type Parser interface {
+	Parse(content []byte, url string) ParseResult
+	Serialize() (name string, args interface{})
+}
 
 // 用于存放需要解析的url及用于解析url的函数
 type Request struct {
-	Url        string
-	ParserFunc ParserFunc
+	Url    string
+	Parser Parser
 }
 
 // 用于存放解析结果
@@ -24,6 +25,37 @@ type Item struct {
 	Payload interface{} // 结果内容
 }
 
-func NilParser([]byte) ParseResult {
+// nil parser
+type NilParser struct{}
+
+func (NilParser) Parse(_ []byte, _ string) ParseResult {
 	return ParseResult{}
+}
+
+func (NilParser) Serialize() (name string, args interface{}) {
+	return "NilParser", nil
+}
+
+// 公共解析函数
+type ParserFunc func(
+	contents []byte, url string) ParseResult
+
+type FuncParser struct {
+	parser ParserFunc // 函数
+	name   string     // 函数名
+}
+
+func (f *FuncParser) Parse(content []byte, url string) ParseResult {
+	return f.parser(content, url)
+}
+
+func (f *FuncParser) Serialize() (name string, args interface{}) {
+	return f.name, nil
+}
+
+func NewFuncParser(p ParserFunc, name string) *FuncParser {
+	return &FuncParser{
+		parser: p,
+		name:   name,
+	}
 }

@@ -2,16 +2,16 @@ package main
 
 import (
 	"crawler/distributed/config"
+	"crawler/distributed/persist/client"
 	"crawler/engine"
-	"crawler/persist"
 	"crawler/scheduler"
 	"crawler/web01/parser"
-	//"io/ioutil"
+	"fmt"
 )
 
 func main() {
 	// 初始化数据存储
-	itemChan, err := persist.ItemSaver("dating_profile_new")
+	itemChan, err := client.ItemSaver(fmt.Sprintf(":%v",config.ItemSaverPort))
 	if nil != err {
 		panic(err)
 	}
@@ -26,14 +26,14 @@ func main() {
 	/*// 解析页面
 	e.Run(engine.Request{
 		Url:        "http://www.zhenai.com/zhenghun",
-		ParserFunc: ngine.NewFuncParser(parser.ParseCityList,config.ParseCityList)
+		ParserFunc: parser.ParseCityList,
 	})*/
 
 	// 解析页面
 	e.Run(engine.Request{
 		Url: "http://www.zhenai.com/zhenghun/jinan",
 		//Url:        "http://www.zhenai.com/zhenghun/beijing",
-		Parser: engine.NewFuncParser(parser.ParseCity, config.ParseCity),
+		ParserFunc: parser.ParseCity,
 	})
 
 }
