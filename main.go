@@ -18,9 +18,10 @@ func main() {
 
 	// 初始化页面解析器
 	e := engine.ConcurrentEnigne{
-		Scheduler:   &scheduler.QueuedScheduler{},
-		WorkerCount: 100,
-		ItemChan:    itemChan,
+		Scheduler:        &scheduler.QueuedScheduler{},
+		WorkerCount:      100,
+		ItemChan:         itemChan,
+		RequestProcessor: engine.Worker,
 	}
 
 	/*// 解析页面

@@ -4,8 +4,11 @@ type ConcurrentEnigne struct {
 	Scheduler   Scheduler
 	WorkerCount int
 	// 用于存储数据的队列
-	ItemChan chan Item
+	ItemChan         chan Item
+	RequestProcessor Processor
 }
+
+type Processor func(Request) (ParseResult, error)
 
 // 实现者只要实现ReadyNotifer及Scheduler中的函数即可
 type Scheduler interface {
@@ -27,7 +30,7 @@ func (e *ConcurrentEnigne) Run(seeds ...Request) {
 
 	// 开启WorkerCount个工作
 	for i := 0; i < e.WorkerCount; i++ {
-		createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
+		e.createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 
 	// 种子首先运行
@@ -66,15 +69,16 @@ func isDuplicate(url string) bool {
 
 // 工作函数，逻辑是 in通道接收到request，即会调用worker函数爬每一个
 // request中的网址，用对应的解析器。 解析完成后，将ParseResult返回给通道out
-func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifer) {
+func (e *ConcurrentEnigne) createWorker(in chan Request,
+	out chan ParseResult, ready ReadyNotifer) {
 	go func() {
 		for {
 			// 传递到调度器，提示可以开始工作
 			ready.WorkReady(in)
 			// 有任务到工作中
 			request := <-in
-			// 开始工作
-			result, err := Worker(request)
+			// 开始工作，分布式要改为rpc调用
+			result, err := e.RequestProcessor(request)
 			if nil != err {
 				continue
 			}

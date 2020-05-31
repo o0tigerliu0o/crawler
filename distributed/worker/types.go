@@ -51,6 +51,7 @@ func SerializeResult(
 }
 
 func DeserializeRequest(r Request) (engine.Request, error) {
+
 	parser, err := deserializeParser(r.Parser)
 	if err != nil {
 		return engine.Request{}, err
@@ -71,7 +72,7 @@ func DeserializeResult(r ParseResult) engine.ParseResult {
 		engineReq, err := DeserializeRequest(req)
 		if nil != err {
 			log.Printf("error deserializing "+
-				"request: :v", err)
+				"request:%v", err)
 			continue
 		}
 
@@ -100,6 +101,6 @@ func deserializeParser(p SerializedParser) (engine.Parser, error) {
 				"arg. arg=[%v]", p.Args)
 		}
 	default:
-		return nil, errors.New("unknow parser name")
+		return nil, errors.New(fmt.Sprintf("unknow parser name. name=[%v]", p.Name))
 	}
 }
