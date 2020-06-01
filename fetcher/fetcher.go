@@ -2,6 +2,7 @@ package fetcher
 
 import (
 	"bufio"
+	"crawler/distributed/config"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -14,12 +15,13 @@ import (
 	"golang.org/x/text/transform"
 )
 
-var rateLimiter = time.Tick(300 * time.Millisecond)
+var rateLimiter = time.Tick(time.Second / config.Qps)
 
 func Fetch(url string) ([]byte, error) {
 
 	<-rateLimiter
 	// 将网页抓下来
+	log.Printf("Fetching url %v", url)
 
 	resp, err := http.Get(url)
 
