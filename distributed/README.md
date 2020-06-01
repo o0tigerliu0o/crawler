@@ -1,5 +1,5 @@
-#分布式版爬虫
-##启动方式
+# 分布式版爬虫
+## 启动方式
 ###1 修改配置文件
 crawler/distributed/config/config.go
 ###2 启动itemSaver  用于存储数据到elasticSearch
@@ -15,5 +15,5 @@ go run crawler/frontend/main.go
 http://127.0.0.1:8888/
 ![Image text](https://https://github.com/o0tigerliu0o/crawler/tree/master/frontend/view/image/readme.png)
 
-##TODO
+## TODO
 单机url去重效率低，无法保存之前去重的结果(之前放到map中) => 基于Kep-Value Store(如Redis)进行分布式去重
